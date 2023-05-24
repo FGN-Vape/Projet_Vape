@@ -3,11 +3,28 @@
 {% block title %}GN Vape - Accueil
 {% endblock %}
 {% block body %}
-    <div class="container mt-4">
-            <h1 class="display-4">Bienvenue sur GN Vape !</h1>
-            <p class="lead">Cette application représente une boutique de vape en ligne.</p>
-            <hr class="mt-4">
-            <p>Pour commencer, rendez-vous sur le shop pour voir nos produits.</p>
-            <p>Ce site a été réalisé dans le cadre de l'épreuve E5 du BTS SIO.</p>
-    </div>
+	<div class="container mt-4">
+		<h1 class="display-4">Bienvenue sur GN Vape !</h1>
+		<p class="lead">Cette application représente une boutique de vape en ligne.</p>
+		<hr class="mt-4">
+		<p>Pour commencer, rendez-vous sur le shop pour voir nos produits.</p>
+		<p>Ce site a été réalisé dans le cadre de l'épreuve E5 du BTS SIO.</p>
+	</div>
+	{% apply inline_css %}
+	<style>
+		.img-fluid {
+			width: 400px;
+			height: 150px;
+		}
+	</style>
+	<div class="container">
+		<div class="row py-3 border-bottom">
+			<div class="col-sm-4 col-lg-3 text-center text-sm-start">
+				<div class="main-logo">
+					<img src="{{ asset('img/logo.png') }}" alt="logo" class="img-fluid">
+				</div>
+			</div>
+		</div>
+	</div>
+{% endapply %}
 {% endblock %}
