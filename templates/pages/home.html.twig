@@ -4,6 +4,11 @@
 {% endblock %}
 {% block body %}
 	<div class="container mt-4">
+	{% for message in app.flashes('success') %}
+        <div class="alert alert-success mt-4">
+          {{ message }}
+        </div>
+        {% endfor %}
 		<h1 class="display-4">Bienvenue sur GN Vape !</h1>
 		<p class="lead">Cette application représente une boutique de vape en ligne.</p>
 		<hr class="mt-4">
