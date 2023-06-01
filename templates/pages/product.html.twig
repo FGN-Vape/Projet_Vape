@@ -16,10 +16,7 @@
 					</div>
 					<p class="lead">{{ produit.description }}</p>
 					<div class="d-flex">
-						<button class="btn btn-outline-dark flex-shrink-0" type="button">
-							<i class="bi-cart-fill me-1"></i>
-							Ajouter au panier
-						</button>
+						<a href={{ path('ajoutPanier.index', { id: produit.id })}} class="btn btn-secondary btn-lg text-uppercase fs-6 rounded-1">Ajouter au panier</a>
 					</div>
 				</div>
 			</div>

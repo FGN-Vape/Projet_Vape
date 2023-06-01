@@ -2,11 +2,14 @@
 
 namespace App\Entity;
 
-use App\Repository\OrderRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use App\Entity\User;
 use Doctrine\ORM\Mapping as ORM;
-use phpDocumentor\Reflection\Types\Boolean;
+use App\Repository\OrderRepository;
+
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+
+use App\Entity\Product; // Ajout des déclarations use pour User et Product
 
 #[ORM\Entity(repositoryClass: OrderRepository::class)]
 #[ORM\Table(name: '`to_order`')]
@@ -21,7 +24,7 @@ class Order
     private Collection $Product;
 
     #[ORM\Column()]
-    private Boolean $isValidated;
+    private bool $isValidated;
 
     public function __construct()
     {
@@ -76,12 +79,12 @@ class Order
         return $this;
     }
 
-    public function getIsValidated(): Boolean
+    public function getIsValidated(): bool
     {
         return $this->isValidated;
     }
 
-    public function setIsValidated(string $isValidated): self
+    public function setIsValidated(bool $isValidated): self
     {
         $this->isValidated = $isValidated;
 

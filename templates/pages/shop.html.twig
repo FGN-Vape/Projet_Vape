@@ -5,6 +5,14 @@
 {% block body %}
 {% include "components/navbar_shop.html.twig" %}
 
+{% apply inline_css %}
+<style>
+	.img-thumbnail {
+		max-width: 150px;
+		max-height: 150px;
+	}
+</style>
+
 <section class="py-3" style="background-image: url('images/background-pattern.jpg');background-repeat: no-repeat;background-size: cover;"><div class="container-fluid">
 <div class="row">
 	<div class="col-md-12">
@@ -22,10 +30,10 @@
 									<div class="categories mb-3 pb-3">100% vape</div>
 									<h3 class="banner-title">Nouvelle Vaporesso deluxe</h3>
 									<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Dignissim massa diam elementum.</p>
-									<a href="/produit" class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1">En savoir plus</a>
+									<a href={{ path('product.index', { id: 2 })}} class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1">En savoir plus</a>
 								</div>
 								<div class="img-wrapper col-md-5">
-									<img src="img/vapo_deluxe.png" class="img-fluid">
+									<img src="img/vapo_deluxe.png" class="img-thumbnail">
 								</div>
 							</div>
 						</div>
@@ -34,12 +42,12 @@
 							<div class="row banner-content p-5">
 								<div class="content-wrapper col-md-7">
 									<div class="categories mb-3 pb-3">100% fresh</div>
-									<h3 class="banner-title">Nouveau goût menthe fraiche par Alfaliquide</h3>
+									<h3 class="banner-title">Nouveau goût menthe fraiche par Alfaliquid</h3>
 									<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Dignissim massa diam elementum.</p>
-									<a href="#" class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1">En savoir plus</a>
+									<a href={{ path('product.index', { id: 5 })}} class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1">En savoir plus</a>
 								</div>
 								<div class="img-wrapper col-md-5">
-									<img src="images/product-thumb-1.png" class="img-fluid">
+									<img src="images/product-thumb-1.png" class="img-thumbnail">
 								</div>
 							</div>
 						</div>
@@ -48,12 +56,12 @@
 							<div class="row banner-content p-5">
 								<div class="content-wrapper col-md-7">
 									<div class="categories mb-3 pb-3">100% power</div>
-									<h3 class="banner-title">Nouvelle resistance 0.2 ohm par Eleaf</h3>
+									<h3 class="banner-title">Nouvelle resistance 0.5 ohm par Eleaf</h3>
 									<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Dignissim massa diam elementum.</p>
-									<a href="#" class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1">En savoir plus</a>
+									<a href={{ path('product.index', { id: 3 })}} class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1">En savoir plus</a>
 								</div>
 								<div class="img-wrapper col-md-5">
-									<img src="images/product-thumb-2.png" class="img-fluid">
+									<img src="images/product-thumb-2.png" class="img-thumbnail">
 								</div>
 							</div>
 						</div>
@@ -67,4 +75,4 @@
 		<!-- / Banner Blocks -->
 
 	</div>
-</div></div></section>{% endblock %}
+</div></div></section>{% endapply %}{% endblock %}
