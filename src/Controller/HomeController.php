@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Order;
 use App\Entity\Product;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,17 +17,19 @@ class HomeController extends AbstractController
         return $this->render('pages/home.html.twig');
     }
     #[Route('/shop', 'shop.index', methods: ['GET', 'POST'])]
-        public function shop(): Response
+        public function shop(EntityManagerInterface $manager): Response
     {
-        return $this->render('pages/shop.html.twig');
+        $lesProduits = $manager->getRepository(Product::class)->findAll();
+        return $this->render('pages/shop.html.twig', [
+            'produits' => $lesProduits,
+        ]);
     }
-    #[Route('/produit', 'product.index', methods: ['GET', 'POST'])]
-        public function product(EntityManagerInterface $manager): Response
+    
+    #[Route('/produit/{id}', 'product.index', methods: ['GET', 'POST'])]
+        public function product(EntityManagerInterface $manager, int $id): Response
     {
-        // Récupérer l'identifiant du produit à partir de la base de données
-        $produitId = 2;
         // Récupérer le produit à partir de l'identifiant
-        $produit = $manager->getRepository(Product::class)->find($produitId);
+        $produit = $manager->getRepository(Product::class)->find($id);
 
         return $this->render('pages/product.html.twig', [
             'produit' => $produit,
@@ -39,5 +42,18 @@ class HomeController extends AbstractController
         return $this->render('pages/list_products.html.twig', [
             'produits' => $lesProduits,
         ]);
+    }
+    #[Route('/ajoutPanier/{id}', 'ajoutPanier.index', methods: ['GET', 'POST'])]
+    public function AjouterauPanier(EntityManagerInterface $manager, int $id) : Response
+    {
+        $produit = $manager->getRepository(Product::class)->find($id);
+        $this->denyAccessUnlessGranted("ROLE_USER");
+        $order = new Order();
+        $order->addUser($this->getUser())
+        ->addProduct($produit)
+        ->setIsValidated(0);
+        $manager->persist($order);
+        $manager->flush();
+        return $this->redirectToRoute('shop.index');
     }
 }
