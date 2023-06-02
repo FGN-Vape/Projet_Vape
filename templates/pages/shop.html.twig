@@ -3,76 +3,86 @@
 {% block title %}GN Vape - Shop
 {% endblock %}
 {% block body %}
-{% include "components/navbar_shop.html.twig" %}
+	{% include "components/navbar_shop.html.twig" %}
 
-{% apply inline_css %}
-<style>
-	.img-thumbnail {
-		max-width: 150px;
-		max-height: 150px;
-	}
-</style>
+	{% apply inline_css %}
+	<style>
+		.img-thumbnail {
+			max-width: 150px;
+			max-height: 150px;
+		}
+	</style>
+	{% for message in app.flashes('success') %}
+		<div class="alert alert-dismissible alert-success">
+  			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+			{{ message }}
+		</div>
+	{% endfor %}
+	<section class="py-3" style="background-image: url('images/background-pattern.jpg');background-repeat: no-repeat;background-size: cover;">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-md-12">
 
-<section class="py-3" style="background-image: url('images/background-pattern.jpg');background-repeat: no-repeat;background-size: cover;"><div class="container-fluid">
-<div class="row">
-	<div class="col-md-12">
+					<div class="banner-blocks">
 
-		<div class="banner-blocks">
+						<div class="banner-ad large block-1">
 
-			<div class="banner-ad large block-1">
+							<div class="swiper main-swiper">
+								<div class="swiper-wrapper">
 
-				<div class="swiper main-swiper">
-					<div class="swiper-wrapper">
+									<div class="swiper-slide">
+										<div class="row banner-content p-5">
+											<div class="content-wrapper col-md-7">
+												<div class="categories mb-3 pb-3">100% vape</div>
+												<h3 class="banner-title">Nouvelle Vaporesso deluxe</h3>
+												<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Dignissim massa diam elementum.</p>
+												<a href={{ path('product.index', { id: 2 } )}} class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1">En savoir plus</a>
+											</div>
+											<div class="img-wrapper col-md-5">
+												<img src="img/vapo_deluxe.png" class="img-thumbnail">
+											</div>
+										</div>
+									</div>
 
-						<div class="swiper-slide">
-							<div class="row banner-content p-5">
-								<div class="content-wrapper col-md-7">
-									<div class="categories mb-3 pb-3">100% vape</div>
-									<h3 class="banner-title">Nouvelle Vaporesso deluxe</h3>
-									<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Dignissim massa diam elementum.</p>
-									<a href={{ path('product.index', { id: 2 })}} class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1">En savoir plus</a>
+									<div class="swiper-slide">
+										<div class="row banner-content p-5">
+											<div class="content-wrapper col-md-7">
+												<div class="categories mb-3 pb-3">100% fresh</div>
+												<h3 class="banner-title">Nouveau goût menthe fraiche par Alfaliquid</h3>
+												<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Dignissim massa diam elementum.</p>
+												<a href={{ path('product.index', { id: 5 } )}} class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1">En savoir plus</a>
+											</div>
+											<div class="img-wrapper col-md-5">
+												<img src="images/product-thumb-1.png" class="img-thumbnail">
+											</div>
+										</div>
+									</div>
+
+									<div class="swiper-slide">
+										<div class="row banner-content p-5">
+											<div class="content-wrapper col-md-7">
+												<div class="categories mb-3 pb-3">100% power</div>
+												<h3 class="banner-title">Nouvelle resistance 0.5 ohm par Eleaf</h3>
+												<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Dignissim massa diam elementum.</p>
+												<a href={{ path('product.index', { id: 3 } )}} class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1">En savoir plus</a>
+											</div>
+											<div class="img-wrapper col-md-5">
+												<img src="images/product-thumb-2.png" class="img-thumbnail">
+											</div>
+										</div>
+									</div>
 								</div>
-								<div class="img-wrapper col-md-5">
-									<img src="img/vapo_deluxe.png" class="img-thumbnail">
-								</div>
-							</div>
-						</div>
 
-						<div class="swiper-slide">
-							<div class="row banner-content p-5">
-								<div class="content-wrapper col-md-7">
-									<div class="categories mb-3 pb-3">100% fresh</div>
-									<h3 class="banner-title">Nouveau goût menthe fraiche par Alfaliquid</h3>
-									<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Dignissim massa diam elementum.</p>
-									<a href={{ path('product.index', { id: 5 })}} class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1">En savoir plus</a>
-								</div>
-								<div class="img-wrapper col-md-5">
-									<img src="images/product-thumb-1.png" class="img-thumbnail">
-								</div>
-							</div>
-						</div>
+								<div class="swiper-pagination"></div>
 
-						<div class="swiper-slide">
-							<div class="row banner-content p-5">
-								<div class="content-wrapper col-md-7">
-									<div class="categories mb-3 pb-3">100% power</div>
-									<h3 class="banner-title">Nouvelle resistance 0.5 ohm par Eleaf</h3>
-									<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Dignissim massa diam elementum.</p>
-									<a href={{ path('product.index', { id: 3 })}} class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1">En savoir plus</a>
-								</div>
-								<div class="img-wrapper col-md-5">
-									<img src="images/product-thumb-2.png" class="img-thumbnail">
-								</div>
 							</div>
 						</div>
 					</div>
-
-					<div class="swiper-pagination"></div>
+					<!-- / Banner Blocks -->
 
 				</div>
 			</div>
 		</div>
-		<!-- / Banner Blocks -->
-
-	</div>
-</div></div></section>{% endapply %}{% endblock %}
+	</section>
+	{% endapply %}
+{% endblock %}

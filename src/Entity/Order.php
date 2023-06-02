@@ -2,79 +2,47 @@
 
 namespace App\Entity;
 
-use App\Entity\User;
-use Doctrine\ORM\Mapping as ORM;
 use App\Repository\OrderRepository;
-
-use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Collections\ArrayCollection;
-
-use App\Entity\Product; // Ajout des déclarations use pour User et Product
+use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: OrderRepository::class)]
-#[ORM\Table(name: '`to_order`')]
+#[ORM\Table(name: 'to_order')]
 class Order
 {
     #[ORM\Id]
-    #[ORM\ManyToOne(targetEntity: user::class, inversedBy: 'orders')]
-    private Collection $User;
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'orders')]
+    private User $user;
 
     #[ORM\Id]
-    #[ORM\ManyToOne(targetEntity: product::class, inversedBy: 'orders')]
-    private Collection $Product;
+    #[ORM\ManyToOne(targetEntity: Product::class, inversedBy: 'orders')]
+    private Product $product;
 
-    #[ORM\Column()]
+    #[ORM\Column(type: 'boolean')]
     private bool $isValidated;
 
-    public function __construct()
+    #[ORM\Column]
+    private ?int $quantity = null;
+
+    public function getUser(): User
     {
-        $this->User = new ArrayCollection();
-        $this->Product = new ArrayCollection();
-    }
-    /**
-     * @return Collection<int, user>
-     */
-    public function getUser(): Collection
-    {
-        return $this->User;
+        return $this->user;
     }
 
-    public function addUser(user $user): self
+    public function setUser(User $user): self
     {
-        if (!$this->User->contains($user)) {
-            $this->User->add($user);
-        }
+        $this->user = $user;
 
         return $this;
     }
 
-    public function removeUser(user $user): self
+    public function getProduct(): Product
     {
-        $this->User->removeElement($user);
-
-        return $this;
+        return $this->product;
     }
 
-    /**
-     * @return Collection<int, product>
-     */
-    public function getProduct(): Collection
+    public function setProduct(Product $product): self
     {
-        return $this->Product;
-    }
-
-    public function addProduct(product $product): self
-    {
-        if (!$this->Product->contains($product)) {
-            $this->Product->add($product);
-        }
-
-        return $this;
-    }
-
-    public function removeProduct(product $product): self
-    {
-        $this->Product->removeElement($product);
+        $this->product = $product;
 
         return $this;
     }
@@ -89,5 +57,21 @@ class Order
         $this->isValidated = $isValidated;
 
         return $this;
+    }
+
+    public function getQuantity(): ?int
+    {
+        return $this->quantity;
+    }
+
+    public function setQuantity(int $quantity): self
+    {
+        $this->quantity = $quantity;
+
+        return $this;
+    }
+    public function getPrice(): float
+    {
+        return $this->product->getPrice();
     }
 }
