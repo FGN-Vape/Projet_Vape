@@ -12,21 +12,30 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class HomeController extends AbstractController
 {
     #[Route('/', 'home.index', methods: ['GET'])]
-        public function index(): Response
+    public function index(): Response
     {
         return $this->render('pages/home.html.twig');
     }
     #[Route('/shop', 'shop.index', methods: ['GET', 'POST'])]
-        public function shop(EntityManagerInterface $manager): Response
+    public function shop(EntityManagerInterface $manager): Response
     {
         $lesProduits = $manager->getRepository(Product::class)->findAll();
+        $panier = $manager->getRepository(Order::class)->findBy(['user' => $this->getUser()]);
+
+        // Calculer la somme des prix des produits dans le panier
+        $total = 0;
+        foreach ($panier as $produit) {
+            $total += $produit->getPrice()* $produit->getQuantity();
+        }
+
         return $this->render('pages/shop.html.twig', [
             'produits' => $lesProduits,
+            'total' => $total,
         ]);
     }
-    
+
     #[Route('/produit/{id}', 'product.index', methods: ['GET', 'POST'])]
-        public function product(EntityManagerInterface $manager, int $id): Response
+    public function product(EntityManagerInterface $manager, int $id): Response
     {
         // Récupérer le produit à partir de l'identifiant
         $produit = $manager->getRepository(Product::class)->find($id);
@@ -36,7 +45,7 @@ class HomeController extends AbstractController
         ]);
     }
     #[Route('/liste', 'list_products.index', methods: ['GET'])]
-        public function liste(EntityManagerInterface $manager): Response
+    public function liste(EntityManagerInterface $manager): Response
     {
         $lesProduits = $manager->getRepository(Product::class)->findAll();
         return $this->render('pages/list_products.html.twig', [
@@ -44,16 +53,33 @@ class HomeController extends AbstractController
         ]);
     }
     #[Route('/ajoutPanier/{id}', 'ajoutPanier.index', methods: ['GET', 'POST'])]
-    public function AjouterauPanier(EntityManagerInterface $manager, int $id) : Response
+    public function AjouterauPanier(EntityManagerInterface $manager, int $id): Response
     {
         $produit = $manager->getRepository(Product::class)->find($id);
         $this->denyAccessUnlessGranted("ROLE_USER");
         $order = new Order();
-        $order->addUser($this->getUser())
-        ->addProduct($produit)
-        ->setIsValidated(0);
+        $orderRepository = $manager->getRepository(Order::class);
+        $existingOrder = $orderRepository->findOneBy([
+            'user' => $this->getUser(),
+            'product' => $produit,
+        ]);
+
+        if ($existingOrder) {
+            // L'utilisateur a déjà commandé ce produit
+            $order = $existingOrder->setQuantity($existingOrder->getQuantity() + 1);
+        } else {
+            $order->setUser($this->getUser())
+                ->setProduct($produit)
+                ->setIsValidated(0)
+                ->setQuantity(1);
+        }
+        $this->addFlash(
+            'success',
+            'Votre article a été ajouté à votre panier'
+        );
         $manager->persist($order);
         $manager->flush();
         return $this->redirectToRoute('shop.index');
     }
+
 }
