@@ -25,7 +25,7 @@ class HomeController extends AbstractController
         // Calculer la somme des prix des produits dans le panier
         $total = 0;
         foreach ($panier as $produit) {
-            $total += $produit->getPrice()* $produit->getQuantity();
+            $total += $produit->getPrice() * $produit->getQuantity();
         }
 
         return $this->render('pages/shop.html.twig', [
@@ -48,8 +48,15 @@ class HomeController extends AbstractController
     public function liste(EntityManagerInterface $manager): Response
     {
         $lesProduits = $manager->getRepository(Product::class)->findAll();
+        $panier = $manager->getRepository(Order::class)->findBy(['user' => $this->getUser()]);
+        $total = 0;
+        foreach ($panier as $produit) {
+            $total += $produit->getPrice() * $produit->getQuantity();
+        }
         return $this->render('pages/list_products.html.twig', [
             'produits' => $lesProduits,
+            'total' => $total,
+
         ]);
     }
     #[Route('/ajoutPanier/{id}', 'ajoutPanier.index', methods: ['GET', 'POST'])]
@@ -81,5 +88,81 @@ class HomeController extends AbstractController
         $manager->flush();
         return $this->redirectToRoute('shop.index');
     }
+    #[Route('/panier', 'cart.index', methods: ['GET', 'POST'])]
+    public function panier(EntityManagerInterface $manager): Response
+    {
+        $panier = $manager->getRepository(Order::class)->findBy(['user' => $this->getUser()]);
+        $this->denyAccessUnlessGranted("ROLE_USER");
+        $produits = [];
+        $quantityItems = 0;
+        foreach ($panier as $order) {
+            if ($order->getIsValidated() == 0) {
+                $produits[] = $order->getProduct();
+                $quantityItems += $order->getQuantity(); // Ajouter la quantité de chaque produit à la quantité totale
+                $produit = $order->getProduct();
 
+                $total = 0;
+                foreach ($panier as $produit) {
+                    $total += $produit->getPrice() * $produit->getQuantity();
+                }
+            }
+        }
+
+        // Récupérer la quantité du produit depuis votre source de données
+        return $this->render('pages/cart.html.twig', [
+            'produits' => $produits,
+            'orders' => $panier,
+            'total' => $total,
+            'quantityItems' => $quantityItems,
+        ]);
+    }
+    #[Route('/toCommand', 'tocommand.index', methods: ['GET', 'POST'])]
+    public function tocommand(EntityManagerInterface $manager): Response
+    {
+        $panier = $manager->getRepository(Order::class)->findBy(['user' => $this->getUser()]);
+        $this->denyAccessUnlessGranted("ROLE_USER");
+        $order = new Order();
+        $user = $this->getUser();
+        foreach ($panier as $order) {
+            $order->setUser($user)
+                ->setProduct($order->getProduct())
+                ->setIsValidated(1)
+                ->setOrderedAt(new \DateTimeImmutable());
+        }
+
+        $this->addFlash(
+            'success',
+            'Votre commande est passée, merci pour votre achat'
+        );
+        $total = 0;
+        $manager->persist($order);
+        $manager->flush();
+        return $this->redirectToRoute('home.index', [
+            'total' => $total,
+        ]);
+    }
+    #[Route('/commands', 'commands.index', methods: ['GET'])]
+    public function commands(EntityManagerInterface $manager): Response
+    {
+        $panier = $manager->getRepository(Order::class)->findBy(['user' => $this->getUser()]);
+        $this->denyAccessUnlessGranted("ROLE_USER");
+        $produits = [];
+        $quantityItems = 0;
+        foreach ($panier as $order) {
+            $produits[] = $order->getProduct();
+            $quantityItems += $order->getQuantity(); // Ajouter la quantité de chaque produit à la quantité totale
+            $produit = $order->getProduct();
+        }
+        $total = 0;
+        foreach ($panier as $produit) {
+            $total += $produit->getPrice() * $produit->getQuantity();
+        }
+        // Récupérer la quantité du produit depuis votre source de données
+        return $this->render('pages/commands.html.twig', [
+            'produits' => $produits,
+            'orders' => $panier,
+            'total' => $total,
+            'quantityItems' => $quantityItems,
+        ]);
+    }
 }
