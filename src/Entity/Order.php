@@ -23,6 +23,9 @@ class Order
     #[ORM\Column]
     private ?int $quantity = null;
 
+    #[ORM\Column (nullable: true)]
+    private ?\DateTimeImmutable $OrderedAt = null;
+
     public function getUser(): User
     {
         return $this->user;
@@ -73,5 +76,17 @@ class Order
     public function getPrice(): float
     {
         return $this->product->getPrice();
+    }
+
+    public function getOrderedAt(): ?\DateTimeImmutable
+    {
+        return $this->OrderedAt;
+    }
+
+    public function setOrderedAt(\DateTimeImmutable $OrderedAt): self
+    {
+        $this->OrderedAt = $OrderedAt;
+
+        return $this;
     }
 }

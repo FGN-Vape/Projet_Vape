@@ -1,0 +1,101 @@
+{# {% extends "base.html.twig" %}
+
+{% block title %}GN Vape - Commandes
+{% endblock %}
+
+{% block body %}
+	{% set groupedOrders = {} %}
+	
+		{% for order in orders %}
+			{% set orderedAt = order.orderedAt.format('d-m-Y') %}
+	
+			{% if groupedOrders[orderedAt] is not defined %}
+				{% set groupedOrders = groupedOrders|merge({(orderedAt): [order]}) %}
+			{% else %}
+				{% set groupedOrders = groupedOrders|merge({(orderedAt): groupedOrders[orderedAt]|merge([order])}) %}
+			{% endif %}
+		{% endfor %}
+	
+		{% for date, ordersByDate in groupedOrders %}
+			<div class="card mb-3" style="max-width: 540px;">
+				<div class="row no-gutters">
+					<div class="col-md-4">
+						<img src="img/ecig.jpg" class="card-img" alt="imgProduit">
+					</div>
+					<div class="col-md-8">
+						<div class="card-body">
+							<h5 class="card-title">Commande du
+								{{ date }}</h5>
+	
+	
+							{% for order in ordersByDate %}
+								{% if order.isValidated == 1 %}
+									{% set produit = order.product %}
+									{% set nomProduit = produit.name %}
+									{% set descProduit = produit.description %}
+									{% set prixProduit = produit.price %}
+									{% set imgProduit = produit.img %}
+									{% set typeProduit = produit.type.nametype %}
+									{% set quantity = order.quantity %}
+	
+									<p class="card-text">{{ nomProduit }}
+										x{{ quantity }}</p>
+								{% endfor %}
+								<p class="card-text">Prix total de la commande :
+									{{total}}
+									€</p>
+	
+							</div>
+						</div>
+					</div>
+				</div>
+			{% endfor %} #}
+	{% extends "base.html.twig" %}
+
+{% block title %}GN Vape - Commandes{% endblock %}
+
+{% block body %}
+    {% set groupedOrders = {} %}
+
+    {% for order in orders %}
+        {% set orderedAt = order.orderedAt.format('d-m-Y') %}
+
+        {% if groupedOrders[orderedAt] is not defined %}
+            {% set groupedOrders = groupedOrders|merge({(orderedAt): [order]}) %}
+        {% else %}
+            {% set groupedOrders = groupedOrders|merge({(orderedAt): groupedOrders[orderedAt]|merge([order])}) %}
+        {% endif %}
+    {% endfor %}
+
+    {% if groupedOrders is empty %}
+        <p>Aucune commande validée n'est disponible.</p>
+    {% else %}
+        {% for date, ordersByDate in groupedOrders %}
+            <div class="card mb-3" style="max-width: 540px;">
+                <div class="row no-gutters">
+                    <div class="col-md-4">
+                        <img src="img/ecig.jpg" class="card-img" alt="imgProduit">
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body">
+                            <h5 class="card-title">Commande du {{ date }}</h5>
+                            {% for order in ordersByDate %}
+                                {% if order.isValidated == 1 %}
+                                    {% set produit = order.product %}
+                                    {% set nomProduit = produit.name %}
+                                    {% set descProduit = produit.description %}
+                                    {% set prixProduit = produit.price %}
+                                    {% set imgProduit = produit.img %}
+                                    {% set typeProduit = produit.type.nametype %}
+                                    {% set quantity = order.quantity %}
+                                    <p class="card-text">{{ nomProduit }} x{{ quantity }}</p>
+                                {% endif %}
+                            {% endfor %}
+                            <p class="card-text">Prix total de la commande : {{ total }} €</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endblock %}
