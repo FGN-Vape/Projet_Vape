@@ -17,14 +17,16 @@ class Order
     #[ORM\ManyToOne(targetEntity: Product::class, inversedBy: 'orders')]
     private Product $product;
 
+    #[ORM\Id]
+    #[ORM\ManyToOne(inversedBy: 'orders')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Date $Date = null;
+
     #[ORM\Column(type: 'boolean')]
     private bool $isValidated;
 
     #[ORM\Column]
     private ?int $quantity = null;
-
-    #[ORM\Column (nullable: true)]
-    private ?\DateTimeImmutable $OrderedAt = null;
 
     public function getUser(): User
     {
@@ -78,14 +80,16 @@ class Order
         return $this->product->getPrice();
     }
 
-    public function getOrderedAt(): ?\DateTimeImmutable
+
+
+    public function getDate(): ?Date
     {
-        return $this->OrderedAt;
+        return $this->Date;
     }
 
-    public function setOrderedAt(\DateTimeImmutable $OrderedAt): self
+    public function setDate(?Date $Date): self
     {
-        $this->OrderedAt = $OrderedAt;
+        $this->Date = $Date;
 
         return $this;
     }
