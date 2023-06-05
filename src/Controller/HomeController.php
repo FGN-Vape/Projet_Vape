@@ -3,12 +3,13 @@
 namespace App\Controller;
 
 use App\Entity\Date;
+use App\Entity\Type;
 use App\Entity\User;
 use App\Entity\Order;
 use DateTimeImmutable;
 use App\Entity\Product;
-use App\Entity\Type;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -43,6 +44,40 @@ class HomeController extends AbstractController
         ]);
     }
 
+    #[Route('/recherche', name: 'product_search')]
+public function searchProducts(Request $request, EntityManagerInterface $manager): Response
+{
+    $searchTerm = $request->request->get('search');
+
+    // Utilisez le terme de recherche pour filtrer les produits
+    $lesProduits = $manager->getRepository(Product::class)->createQueryBuilder('p')
+        ->where('p.Name LIKE :searchTerm')
+        ->setParameter('searchTerm', '%' . $searchTerm . '%')
+        ->getQuery()
+        ->getResult();
+
+    // Le reste de votre code pour récupérer les commandes, calculer le total, etc.
+
+    $user = $this->getUser();
+    $orders = $manager->getRepository(Order::class)->findBy(['user' => $user]);
+
+    $quantityItems = 0;
+    $total = 0;
+
+    foreach ($orders as $order) {
+        if ($order->getIsValidated() == 0) {
+            $quantityItems += $order->getQuantity();
+            $total += $order->getProduct()->getPrice() * $order->getQuantity();
+        }
+    }
+
+    return $this->render('pages/list_products.html.twig', [
+        'produits' => $lesProduits,
+        'total' => $total,
+    ]);
+}
+   
+
     #[Route('/produit/{id}', 'product.index', methods: ['GET', 'POST'])]
     public function product(EntityManagerInterface $manager, int $id): Response
     {
@@ -75,7 +110,7 @@ class HomeController extends AbstractController
 
         ]);
     }
-    #[Route('/produits/{type}', name: 'product_list_by_type')]
+    #[Route('/liste/{type}', name: 'product_list_by_type')]
     public function listByType(string $type, EntityManagerInterface $manager): Response
     {
         $typeEntity = $manager->getRepository(Type::class)->findOneBy(['NameType' => $type]);
@@ -104,19 +139,12 @@ class HomeController extends AbstractController
             'type' => $typeEntity,
         ]);
     }
-    #[Route('/produits/marque/{brand}', name: 'product_list_by_brand')]
+    #[Route('/liste/marque/{brand}', name: 'product_list_by_brand')]
 public function listByBrand(string $brand, EntityManagerInterface $manager): Response
 {
-    $brandEntity = $manager->getRepository(Product::class)->findOneBy(['Brand' => $brand]);
-
-    if (!$brandEntity) {
-        throw $this->createNotFoundException('Brand not found');
-    }
-
-    $lesProduits = $manager->getRepository(Product::class)->findBy(['Brand' => $brandEntity]);
+    $lesProduits = $manager->getRepository(Product::class)->findBy(['Brand' => $brand]);
     $user = $this->getUser();
     $orders = $manager->getRepository(Order::class)->findBy(['user' => $user]);
-
     $quantityItems = 0;
     $total = 0;
 
@@ -130,7 +158,7 @@ public function listByBrand(string $brand, EntityManagerInterface $manager): Res
     return $this->render('pages/list_products.html.twig', [
         'produits' => $lesProduits,
         'total' => $total,
-        'brand' => $brandEntity,
+        'brand' => $brand,
     ]);
 }
 
