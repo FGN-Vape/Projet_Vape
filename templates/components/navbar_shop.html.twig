@@ -40,9 +40,11 @@
 		{% if app.user %}
 			<ul class="d-flex justify-content-end list-unstyled m-0">
 				<li>
+					<a href="/profil">
 					<button class="btn btn-light btn-lg">
 						<span class="fa fa-user"></span>
 					</button>
+					</a>
 				</li>
 			</ul>
 			<div class="cart text-end d-none d-lg-block dropdown ">
@@ -77,13 +79,16 @@
 						<a class="nav-link dropdown-toggle" role="button" id="pages" data-bs-toggle="dropdown" aria-expanded="false">Produits</a>
 						<ul class="dropdown-menu" aria-labelledby="pages">
 							<li>
-								<a href="/liste" class="dropdown-item">Cigarettes</a>
+								<a href="/liste" class="dropdown-item">Tout</a>
 							</li>
 							<li>
-								<a href="shop.html" class="dropdown-item">E-liquides</a>
+								<a href="{{ path('product_list_by_type', {'type': 'Cigarette'}) }}" class="dropdown-item">Cigarettes</a>
 							</li>
 							<li>
-								<a href="single-product.html" class="dropdown-item">Résistances</a>
+								<a href="{{ path('product_list_by_type', {'type': 'E-liquide'}) }}" class="dropdown-item">E-liquides</a>
+							</li>
+							<li>
+								<a href="{{ path('product_list_by_type', {'type': 'Résistance'}) }}" class="dropdown-item">Résistances</a>
 							</li>
 						</ul>
 					</li>

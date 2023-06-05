@@ -2,8 +2,12 @@
 
 namespace App\Controller;
 
+use App\Entity\Date;
+use App\Entity\User;
 use App\Entity\Order;
+use DateTimeImmutable;
 use App\Entity\Product;
+use App\Entity\Type;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -20,12 +24,17 @@ class HomeController extends AbstractController
     public function shop(EntityManagerInterface $manager): Response
     {
         $lesProduits = $manager->getRepository(Product::class)->findAll();
-        $panier = $manager->getRepository(Order::class)->findBy(['user' => $this->getUser()]);
+        $user = $this->getUser();
+        $orders = $manager->getRepository(Order::class)->findBy(['user' => $user]);
 
-        // Calculer la somme des prix des produits dans le panier
+        $quantityItems = 0;
         $total = 0;
-        foreach ($panier as $produit) {
-            $total += $produit->getPrice() * $produit->getQuantity();
+
+        foreach ($orders as $order) {
+            if ($order->getIsValidated() == 0) {
+                $quantityItems += $order->getQuantity();
+                $total += $order->getProduct()->getPrice() * $order->getQuantity();
+            }
         }
 
         return $this->render('pages/shop.html.twig', [
@@ -48,10 +57,17 @@ class HomeController extends AbstractController
     public function liste(EntityManagerInterface $manager): Response
     {
         $lesProduits = $manager->getRepository(Product::class)->findAll();
-        $panier = $manager->getRepository(Order::class)->findBy(['user' => $this->getUser()]);
+        $user = $this->getUser();
+        $orders = $manager->getRepository(Order::class)->findBy(['user' => $user]);
+
+        $quantityItems = 0;
         $total = 0;
-        foreach ($panier as $produit) {
-            $total += $produit->getPrice() * $produit->getQuantity();
+
+        foreach ($orders as $order) {
+            if ($order->getIsValidated() == 0) {
+                $quantityItems += $order->getQuantity();
+                $total += $order->getProduct()->getPrice() * $order->getQuantity();
+            }
         }
         return $this->render('pages/list_products.html.twig', [
             'produits' => $lesProduits,
@@ -59,6 +75,65 @@ class HomeController extends AbstractController
 
         ]);
     }
+    #[Route('/produits/{type}', name: 'product_list_by_type')]
+    public function listByType(string $type, EntityManagerInterface $manager): Response
+    {
+        $typeEntity = $manager->getRepository(Type::class)->findOneBy(['NameType' => $type]);
+
+        if (!$typeEntity) {
+            throw $this->createNotFoundException('Type not found');
+        }
+
+        $lesProduits = $manager->getRepository(Product::class)->findBy(['Type' => $typeEntity]);
+        $user = $this->getUser();
+        $orders = $manager->getRepository(Order::class)->findBy(['user' => $user]);
+
+        $quantityItems = 0;
+        $total = 0;
+
+        foreach ($orders as $order) {
+            if ($order->getIsValidated() == 0) {
+                $quantityItems += $order->getQuantity();
+                $total += $order->getProduct()->getPrice() * $order->getQuantity();
+            }
+        }
+
+        return $this->render('pages/list_products.html.twig', [
+            'produits' => $lesProduits,
+            'total' => $total,
+            'type' => $typeEntity,
+        ]);
+    }
+    #[Route('/produits/marque/{brand}', name: 'product_list_by_brand')]
+public function listByBrand(string $brand, EntityManagerInterface $manager): Response
+{
+    $brandEntity = $manager->getRepository(Product::class)->findOneBy(['Brand' => $brand]);
+
+    if (!$brandEntity) {
+        throw $this->createNotFoundException('Brand not found');
+    }
+
+    $lesProduits = $manager->getRepository(Product::class)->findBy(['Brand' => $brandEntity]);
+    $user = $this->getUser();
+    $orders = $manager->getRepository(Order::class)->findBy(['user' => $user]);
+
+    $quantityItems = 0;
+    $total = 0;
+
+    foreach ($orders as $order) {
+        if ($order->getIsValidated() == 0) {
+            $quantityItems += $order->getQuantity();
+            $total += $order->getProduct()->getPrice() * $order->getQuantity();
+        }
+    }
+
+    return $this->render('pages/list_products.html.twig', [
+        'produits' => $lesProduits,
+        'total' => $total,
+        'brand' => $brandEntity,
+    ]);
+}
+
     #[Route('/ajoutPanier/{id}', 'ajoutPanier.index', methods: ['GET', 'POST'])]
     public function AjouterauPanier(EntityManagerInterface $manager, int $id): Response
     {
@@ -69,16 +144,25 @@ class HomeController extends AbstractController
         $existingOrder = $orderRepository->findOneBy([
             'user' => $this->getUser(),
             'product' => $produit,
+            'isValidated' => 0,
         ]);
 
         if ($existingOrder) {
             // L'utilisateur a déjà commandé ce produit
             $order = $existingOrder->setQuantity($existingOrder->getQuantity() + 1);
         } else {
+            // Créer une nouvelle instance de Date
+            $date = new Date();
+            $dateactuelle = new DateTimeImmutable();
+            $date->setDatetime($dateactuelle);
+            $manager->persist($date);
+
             $order->setUser($this->getUser())
                 ->setProduct($produit)
                 ->setIsValidated(0)
-                ->setQuantity(1);
+                ->setQuantity(1)
+                // Lier la nouvelle date à l'objet Order
+                ->setDate($date);
         }
         $this->addFlash(
             'success',
@@ -88,32 +172,27 @@ class HomeController extends AbstractController
         $manager->flush();
         return $this->redirectToRoute('shop.index');
     }
+
     #[Route('/panier', 'cart.index', methods: ['GET', 'POST'])]
     public function panier(EntityManagerInterface $manager): Response
     {
-        $panier = $manager->getRepository(Order::class)->findBy(['user' => $this->getUser()]);
-        $this->denyAccessUnlessGranted("ROLE_USER");
-        $produits = [];
-        $quantityItems = 0;
-        foreach ($panier as $order) {
-            if ($order->getIsValidated() == 0) {
-                $produits[] = $order->getProduct();
-                $quantityItems += $order->getQuantity(); // Ajouter la quantité de chaque produit à la quantité totale
-                $produit = $order->getProduct();
+        $user = $this->getUser();
+        $orders = $manager->getRepository(Order::class)->findBy(['user' => $user]);
 
-                $total = 0;
-                foreach ($panier as $produit) {
-                    $total += $produit->getPrice() * $produit->getQuantity();
-                }
+        $quantityItems = 0;
+        $total = 0;
+
+        foreach ($orders as $order) {
+            if ($order->getIsValidated() == 0) {
+                $quantityItems += $order->getQuantity();
+                $total += $order->getProduct()->getPrice() * $order->getQuantity();
             }
         }
 
-        // Récupérer la quantité du produit depuis votre source de données
         return $this->render('pages/cart.html.twig', [
-            'produits' => $produits,
-            'orders' => $panier,
-            'total' => $total,
+            'orders' => $orders,
             'quantityItems' => $quantityItems,
+            'total' => $total,
         ]);
     }
     #[Route('/toCommand', 'tocommand.index', methods: ['GET', 'POST'])]
@@ -122,12 +201,17 @@ class HomeController extends AbstractController
         $panier = $manager->getRepository(Order::class)->findBy(['user' => $this->getUser()]);
         $this->denyAccessUnlessGranted("ROLE_USER");
         $order = new Order();
+        $date = new Date();
+        $dateactuelle = new DateTimeImmutable();
+        $date->setDatetime($dateactuelle);
+        $manager->persist($date);
+
         $user = $this->getUser();
         foreach ($panier as $order) {
             $order->setUser($user)
                 ->setProduct($order->getProduct())
                 ->setIsValidated(1)
-                ->setOrderedAt(new \DateTimeImmutable());
+                ->setDate($date);
         }
 
         $this->addFlash(
@@ -148,21 +232,30 @@ class HomeController extends AbstractController
         $this->denyAccessUnlessGranted("ROLE_USER");
         $produits = [];
         $quantityItems = 0;
-        foreach ($panier as $order) {
-            $produits[] = $order->getProduct();
-            $quantityItems += $order->getQuantity(); // Ajouter la quantité de chaque produit à la quantité totale
-            $produit = $order->getProduct();
-        }
         $total = 0;
-        foreach ($panier as $produit) {
-            $total += $produit->getPrice() * $produit->getQuantity();
+
+        foreach ($panier as $order) {
+            if ($order->getIsValidated() == 1) {
+                $produits[] = $order->getProduct();
+                $quantityItems += $order->getQuantity(); // Ajouter la quantité de chaque produit à la quantité totale
+                $total += $order->getProduct()->getPrice() * $order->getQuantity();
+            }
         }
-        // Récupérer la quantité du produit depuis votre source de données
+
         return $this->render('pages/commands.html.twig', [
             'produits' => $produits,
             'orders' => $panier,
             'total' => $total,
             'quantityItems' => $quantityItems,
+        ]);
+    }
+    #[Route('/profil', 'profil.index', methods: ['GET'])]
+    public function profile(EntityManagerInterface $manager): Response
+    {
+        $this->denyAccessUnlessGranted("ROLE_USER");
+        $user = $manager->getRepository(User::class)->findBy(['id' => $this->getUser()]);
+        return $this->render('pages/profile.html.twig', [
+            'User' => $user,
         ]);
     }
 }
