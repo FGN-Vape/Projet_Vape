@@ -1,89 +1,94 @@
 {% extends "base.html.twig" %}
 
-{% block title %}GN Vape - Panier{% endblock %}
+{% block title %}GN Vape - Panier
+{% endblock %}
 
 {% block body %}
-{% if orders is defined %}
-    <section class="h-100 h-custom">
-        <div class="container py-5 h-100">
-            <div class="row d-flex justify-content-center align-items-center h-100">
-                <div class="col-12">
-                    <div class="card card-registration card-registration-2" style="border-radius: 15px;">
-                        <div class="card-body p-0">
-                            <div class="row g-0">
-                                <div class="col-lg-8">
-                                    <div class="p-5">
-                                        <div class="d-flex justify-content-between align-items-center mb-5">
-                                            <h1 class="fw-bold mb-0 text-light">Mon Panier</h1>
-                                            <h6 class="mb-0 text-muted">{{ quantityItems }} articles</h6>
-                                        </div>
-                                        <hr class="my-4">
-                                        {% for order in orders %}
-                                            {% if not order.isValidated %}
-                                                {% set produit = order.product %}
-                                                {% set nomProduit = produit.name %}
-                                                {% set prixProduit = produit.price %}
-                                                {% set imgProduit = produit.img %}
-                                                {% set typeProduit = produit.type.nametype %}
-                                                {% set quantity = order.quantity %}
+	{% if orders is defined %}
+		<section class="h-100 h-custom">
+			<div class="container py-5 h-100">
+				<div class="row d-flex justify-content-center align-items-center h-100">
+					<div class="col-12">
+						<div class="card card-registration card-registration-2" style="border-radius: 15px;">
+							<div class="card-body p-0">
+								<div class="row g-0">
+									<div class="col-lg-8">
+										<div class="p-5">
+											<div class="d-flex justify-content-between align-items-center mb-5">
+												<h1 class="fw-bold mb-0 text-light">Mon Panier</h1>
+												<h6 class="mb-0 text-muted">{{ quantityItems }}
+													articles</h6>
+											</div>
+											<hr class="my-4">
+											{% for order in orders %}
+												{% if not order.isValidated %}
+													{% set produit = order.product %}
+													{% set nomProduit = produit.name %}
+													{% set prixProduit = produit.price %}
+													{% set imgProduit = produit.img %}
+													{% set typeProduit = produit.type.nametype %}
+													{% set quantity = order.quantity %}
 
-                                                <div class="row mb-4 d-flex justify-content-between align-items-center">
-                                                    <div class="col-md-2 col-lg-2 col-xl-2">
-                                                        <img src="{{ imgProduit }}" class="img-fluid rounded-3" alt="img du produit">
-                                                    </div>
-                                                    <div class="col-md-3 col-lg-3 col-xl-3">
-                                                        <h6 class="text-muted">{{ typeProduit }}</h6>
-                                                        <h6 class="text-light mb-0">{{ nomProduit }}</h6>
-                                                    </div>
-                                                    <div class="col-md-3 col-lg-3 col-xl-2 d-flex">
-                                                        <h6 class="mb-0">{{ quantity }}</h6>
-                                                    </div>
-                                                    <div class="col-md-3 col-lg-2 col-xl-2 offset-lg-1">
-                                                        <h6 class="mb-0">{{ prixProduit }} €</h6>
-                                                    </div>
-                                                    
-                                                </div>
-                                            {% endif %}
-                                        {% endfor %}
+													<div class="row mb-4 d-flex justify-content-between align-items-center">
+														<div class="col-md-2 col-lg-2 col-xl-2">
+															<img src="{{ imgProduit }}" class="img-fluid rounded-3" alt="img du produit">
+														</div>
+														<div class="col-md-3 col-lg-3 col-xl-3">
+															<h6 class="text-muted">{{ typeProduit }}</h6>
+															<h6 class="text-light mb-0">{{ nomProduit }}</h6>
+														</div>
+														<div class="col-md-3 col-lg-3 col-xl-2 d-flex">
+															<h6 class="mb-0">{{ quantity }}</h6>
+														</div>
+														<div class="col-md-3 col-lg-2 col-xl-2 offset-lg-1">
+															<h6 class="mb-0">{{ prixProduit }}
+																€</h6>
+														</div>
 
-                                        <hr class="my-4">
+													</div>
+												{% else %}
+													<h6 class="mb-0 text-muted">Vous n'avez pas d'articles</h6>
+												{% endif %}
+											{% endfor %}
 
-                                        <div class="pt-5">
-                                            <h6 class="mb-0">
-                                                <a href="/shop" class="btn btn-primary">
-                                                    <i class="fas fa-long-arrow-alt-left me-2"></i>Retour au shop
-                                                </a>
-                                            </h6>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-4 bg-grey">
-                                    <div class="p-5">
-                                        <h3 class="fw-bold mb-5 mt-2 pt-1">Résumé</h3>
-                                        <hr class="my-4">
+											<hr class="my-4">
 
-                                        <div class="d-flex justify-content-between mb-4">
-                                            <h5 class="text-uppercase">Articles : {{ quantityItems }}</h5>
-                                        </div>
-                                        <hr class="my-4">
+											<div class="pt-5">
+												<h6 class="mb-0">
+													<a href="/shop" class="btn btn-primary">
+														<i class="fas fa-long-arrow-alt-left me-2"></i>Retour au shop
+													</a>
+												</h6>
+											</div>
+										</div>
+									</div>
+									<div class="col-lg-4 bg-grey">
+										<div class="p-5">
+											<h3 class="fw-bold mb-5 mt-2 pt-1">Résumé</h3>
+											<hr class="my-4">
 
-                                        <div class="d-flex justify-content-between mb-5">
-                                            <h5 class="text-uppercase">Prix total :</h5>
-                                            <h5>{{ total }} €</h5>
-                                        </div>
-                                        <a href="/toCommand">
-                                            <button type="button" class="btn btn-secondary btn-block btn-lg" data-mdb-ripple-color="dark">Commander</button>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-{% else %}
-    <h6 class="mb-0 text-light">Votre panier est vide.</h6>
-{% endif %}
+											<div class="d-flex justify-content-between mb-4">
+												<h5 class="text-uppercase">Articles :
+													{{ quantityItems }}</h5>
+											</div>
+											<hr class="my-4">
+
+											<div class="d-flex justify-content-between mb-5">
+												<h5 class="text-uppercase">Prix total :</h5>
+												<h5>{{ total }}
+													€</h5>
+											</div>
+											<a href="/toCommand">
+												<button type="button" class="btn btn-secondary btn-block btn-lg" data-mdb-ripple-color="dark">Commander</button>
+											</a>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	{% endif %}
 {% endblock %}
