@@ -223,6 +223,18 @@ public function listByBrand(string $brand, EntityManagerInterface $manager): Res
             'total' => $total,
         ]);
     }
+    #[Route('/panier/removeProduct/{id}/{idDate}', 'removeCart.index', methods: ['GET', 'POST'])]
+    public function removeProductPanier(EntityManagerInterface $manager, int $id, int $idDate): Response
+    {
+        $user = $this->getUser();
+        $product = $manager->getRepository(Product::class)->find($id);
+        $date = $manager->getRepository(Date::class)->find($idDate);
+        $order = $manager->getRepository(Order::class)->findOneBy(['user' => $user, 'product' => $product, 'Date' => $date]);
+        $manager->remove($order);
+        $manager->flush();
+
+        return $this->redirectToRoute('cart.index');
+    }
     #[Route('/toCommand', 'tocommand.index', methods: ['GET', 'POST'])]
     public function tocommand(EntityManagerInterface $manager): Response
     {

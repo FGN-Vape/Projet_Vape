@@ -28,6 +28,7 @@
 													{% set imgProduit = produit.img %}
 													{% set typeProduit = produit.type.nametype %}
 													{% set quantity = order.quantity %}
+													{% set date = order.date %}
 
 													<div class="row mb-4 d-flex justify-content-between align-items-center">
 														<div class="col-md-2 col-lg-2 col-xl-2">
@@ -45,9 +46,11 @@
 																€</h6>
 														</div>
 
+														<a class="btn btn-danger" href={{ path('removeCart.index', { id: produit.id, idDate: date.id })}}>Supprimer</a>
+
+
 													</div>
-												{% else %}
-													<h6 class="mb-0 text-muted">Vous n'avez pas d'articles</h6>
+
 												{% endif %}
 											{% endfor %}
 
