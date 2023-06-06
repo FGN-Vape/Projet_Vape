@@ -13,7 +13,7 @@
 				</li>
 				{% if is_granted("ROLE_ADMIN") %}
 					<li class="nav-item">
-						<a class="nav-link" href="/admin">Admin
+						<a class="nav-link" href="/admin">Backoffice
 						</a>
 					</li>
 				{% else %}
@@ -24,12 +24,6 @@
 				{% if app.user %}
 					<li class="nav-item">
 						<a class="nav-link" href="/commands">Commandes
-						</a>
-					</li>
-				{% endif %}
-				{% if is_granted("ROLE_ADMIN") %}
-					<li class="nav-item">
-						<a class="nav-link" href="/admin">Admin
 						</a>
 					</li>
 				{% endif %}

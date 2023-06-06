@@ -24,7 +24,7 @@ class AdminController extends AbstractController
     public function index(EntityManagerInterface $manager): Response
     {
         $lesProduits = $manager->getRepository(Product::class)->findAll();
-        return $this->render('admin/index.html.twig', [
+        return $this->render('pages/admin/index.html.twig', [
             'controller_name' => 'AdminController',
             'produits' => $lesProduits
         ]);
@@ -60,7 +60,7 @@ class AdminController extends AbstractController
             return $this->redirectToRoute('list_products.index');
         }
 
-        return $this->render('admin/ajoutProduit.html.twig', [
+        return $this->render('pages/admin/ajoutProduit.html.twig', [
             'form' => $form->createView()
         ]);
     }

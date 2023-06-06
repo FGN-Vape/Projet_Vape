@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+{% block title %}GN Vape - Ajout Produit
+{% endblock %}
+
+{% block body %}
+
+	<style>
+		h1 {
+			margin-top: 15px;
+		}
+	</style>
+
+	<a href="/admin" class="btn btn-primary mt-4">Retour</a>
+	<h1>Ajout Produit</h1>
+
+	{{ form(form) }}{% endblock %}
